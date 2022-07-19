@@ -15,6 +15,14 @@ const userRegister = async (req, res) => {
 				.json({ message: "Mobile number already registered" })
 		}
 
+		//validate input
+		const validate = validateUser(req.body)
+		if (validate) {
+			return res.status(400).json({
+				message: validate,
+			})
+		}
+
 		//password encryption
 		const salt = await bcrypt.genSalt(Number(process.env.SALT))
 		const hashedPassword = await bcrypt.hash(password, salt)
@@ -33,8 +41,28 @@ const userRegister = async (req, res) => {
 			user: savedUser,
 		})
 	} catch (err) {
-		console.log(err)
+		console.log(err.message)
 		res.status(500).json({ message: err.message })
+	}
+}
+
+
+//validate user input
+const validateUser = (data) => {
+	const { name, mobile, password } = data
+	const pswPattern = /^[a-zA-Z0-9]{8,}$/
+	const mobilePattern = /^[0-9]{10}$/
+
+	if (!name || !mobile || !password) {
+		return "Missing required fields"
+	} else if (mobilePattern.test(mobile) === false) {
+		return "Provide a valid mobile number"
+	} else if (password.length < 8) {
+		return "Password should be atleast 8 characters long"
+	} else if (pswPattern.test(password) === false) {
+		return "Password should not contain special characters"
+	} else {
+		return null
 	}
 }
 
