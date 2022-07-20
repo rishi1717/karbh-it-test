@@ -7,15 +7,34 @@ import Button from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import { useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
 
 function Navbar() {
-    const navigate = useNavigate()
+	const token = localStorage.getItem("token")
+	const navigate = useNavigate()
+	const handleLogout = async () => {
+		const con = await Swal.fire({
+			title: "Are you sure?",
+			text: "User will be logged out!",
+			background: "#eaeaea",
+			color: "#595959",
+			showCancelButton: true,
+			cancelButtonColor: "#B81C1C",
+			confirmButtonText: "Logout",
+			confirmButtonColor: "#609ACF",
+		})
+		if (con.isConfirmed) {
+			localStorage.removeItem("token")
+			localStorage.removeItem("user")
+			navigate("/login")
+		}
+	}
 	return (
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar
 				sx={{
 					backgroundColor: "white",
-					px: { xs: 0, sm: 20 },
+					px: { xs: 0, sm: 15 },
 					position: "fixed",
 				}}
 			>
@@ -36,32 +55,61 @@ function Navbar() {
 					>
 						Kar<span style={{ color: "#FF4361" }}>bh</span>
 					</Typography>
-					<Box
-						sx={{
-							display: "flex",
-						}}
-					>
-						<Button
-							color="inherit"
+					{token ? (
+						<Box
 							sx={{
-								color: "#707070",
-								fontSize: "1rem",
+								display: "flex",
 							}}
-							onClick={() => navigate("/login")}
 						>
-							Login
-						</Button>
-						<Button
-							color="inherit"
+							<Button
+								color="inherit"
+								sx={{
+									color: "#707070",
+									fontSize: "1rem",
+								}}
+								onClick={() => navigate("/home")}
+							>
+								Home
+							</Button>
+							<Button
+								color="inherit"
+								sx={{
+									color: "#FF4361",
+									fontSize: "0.8rem",
+								}}
+								onClick={handleLogout}
+							>
+								Logout
+							</Button>
+						</Box>
+					) : (
+						<Box
 							sx={{
-								color: "#707070",
-								fontSize: "1rem",
+								display: "flex",
 							}}
-							onClick={() => navigate("/register")}
 						>
-							Register
-						</Button>
-					</Box>
+							<Button
+								color="inherit"
+								sx={{
+									color: "#707070",
+									fontSize: "1rem",
+								}}
+								onClick={() => navigate("/login")}
+							>
+								Login
+							</Button>
+							<Button
+								color="inherit"
+								sx={{
+									color: "#707070",
+									fontSize: "1rem",
+								}}
+								onClick={() => navigate("/register")}
+							>
+								Register
+							</Button>
+						</Box>
+					)}
 				</Toolbar>
 			</AppBar>
 		</Box>

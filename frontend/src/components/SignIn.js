@@ -10,17 +10,56 @@ import Typography from "@mui/material/Typography"
 import Container from "@mui/material/Container"
 import { Link } from "@mui/material"
 import { useNavigate } from "react-router-dom"
+import axios from "../axios.js"
+import Swal from "sweetalert2"
+import validateSignIn from "../functions/validateSignIn.js"
+
+const Toast = Swal.mixin({
+	background: "#1E1E1E",
+	color: "white",
+	toast: true,
+	position: "top-end",
+	showConfirmButton: false,
+	timerProgressBar: true,
+})
 
 export default function SignIn() {
 	const navigate = useNavigate()
+	const [errors, setErrors] = React.useState({})
 
-	const handleSubmit = (event) => {
-		event.preventDefault()
-		const data = new FormData(event.currentTarget)
-		console.log({
-			email: data.get("email"),
-			password: data.get("password"),
-		})
+	const handleSubmit = async (event) => {
+		try {
+			event.preventDefault()
+			const data = new FormData(event.currentTarget)
+			const err = validateSignIn(data)
+			setErrors(err)
+			if (err.password || err.mobile) {
+				console.log("error")
+				return
+			}
+
+			const details = {
+				mobile: data.get("mobile"),
+				password: data.get("password"),
+			}
+
+			const res = await axios.post("/user/login", details)
+			localStorage.setItem("token", res.data.token)
+			localStorage.setItem("user", res.data.user)
+			Toast.fire({
+				position: "bottom-right",
+				icon: "success",
+				title: "user Logged in",
+				showConfirmButton: false,
+				timer: 3000,
+			})
+			navigate("/home")
+		} catch (err) {
+			if (err.response.data.message) {
+				setErrors({ ...errors, server: err.response.data.message })
+			}
+			console.log(err.response.data.message)
+		}
 	}
 
 	return (
@@ -51,34 +90,73 @@ export default function SignIn() {
 					noValidate
 					sx={{ mt: 1 }}
 				>
-					<TextField
-						margin="normal"
-						required
-						fullWidth
-						id="mobile"
-						label="Mobile"
-						name="mobile"
-						autoComplete="email"
-						autoFocus
-					/>
-					<TextField
-						margin="normal"
-						required
-						fullWidth
-						name="password"
-						label="Password"
-						type="password"
-						id="password"
-						autoComplete="current-password"
-					/>
-					<Button
-						type="submit"
-						fullWidth
-						variant="contained"
-						sx={{ mt: 3, mb: 2 }}
-					>
-						Sign In
-					</Button>
+					<Grid container spacing={0}>
+						<Grid item xs={12}>
+							<TextField
+								margin="normal"
+								required
+								fullWidth
+								id="mobile"
+								label="Mobile"
+								name="mobile"
+								autoComplete="email"
+								autoFocus
+							/>
+							<Typography
+								sx={{
+									color: "red",
+									fontSize: "0.85rem",
+									textAlign: "center",
+									mt: 1,
+								}}
+							>
+								{errors.mobile ? errors.mobile : ""}
+							</Typography>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								margin="normal"
+								required
+								fullWidth
+								name="password"
+								label="Password"
+								type="password"
+								id="password"
+								autoComplete="current-password"
+							/>
+							<Typography
+								sx={{
+									color: "red",
+									fontSize: "0.85rem",
+									textAlign: "center",
+									mt: 1,
+								}}
+							>
+								{errors.password ? errors.password : ""}
+							</Typography>
+						</Grid>
+						<Typography
+							sx={{
+								color: "red",
+								fontSize: "0.85rem",
+								textAlign: "center",
+								mt: 1,
+							}}
+						>
+							{errors.server ? errors.server : ""}
+						</Typography>
+
+						<Grid item xs={12}>
+							<Button
+								type="submit"
+								fullWidth
+								variant="contained"
+								sx={{ mt: 3, mb: 2 }}
+							>
+								Sign In
+							</Button>
+						</Grid>
+					</Grid>
 					<Grid container>
 						<Link
 							onClick={() => {

@@ -10,30 +10,53 @@ import Typography from "@mui/material/Typography"
 import Container from "@mui/material/Container"
 import { useNavigate } from "react-router-dom"
 import { Link } from "@mui/material"
+import validateSignUp from "../functions/validateSignUp"
+import axios from "../axios.js"
+import Swal from "sweetalert2"
 
-const validate = (data) => {
-    const errors = {}
-    if(!data.name){
-        errors.name = "Name is required"
-    }
-    if (!data.mobile) {
-        errors.mobile = "Mobile number is required"
-    }
-    if (!data.password) {
-        errors.password = "Password is required"
-    }
-    return errors
-}
+const Toast = Swal.mixin({
+	background: "#1E1E1E",
+	color: "white",
+	toast: true,
+	position: "top-end",
+	showConfirmButton: false,
+	timerProgressBar: true,
+})
 
 export default function SignUp() {
 	const navigate = useNavigate()
 
-	const handleSubmit = (event) => {
-		event.preventDefault()
-		const data = new FormData(event.currentTarget)
-		validate(data)
+	const [errors, setErrors] = React.useState({})
 
-
+	const handleSubmit = async (event) => {
+		try {
+			event.preventDefault()
+			const data = new FormData(event.currentTarget)
+			const err = validateSignUp(data)
+			setErrors(err)
+			if (err.email || err.password || err.mobile) {
+				console.log("error")
+				return
+			}
+			const details = {
+				name: data.get("name"),
+				mobile: data.get("mobile"),
+				password: data.get("password"),
+			}
+			await axios.post("/user", details)
+			Toast.fire({
+				position: "bottom-right",
+				icon: "success",
+				title: "user registered",
+				showConfirmButton: false,
+				timer: 3000,
+			})
+			navigate("/login")
+		} catch (err) {	
+			if (err.response.data.message){
+				setErrors({ ...errors, server: err.response.data.message })
+			} console.log(err.response.data.message)
+		}
 	}
 
 	return (
@@ -75,6 +98,16 @@ export default function SignUp() {
 								label="Name"
 								autoFocus
 							/>
+							<Typography
+								sx={{
+									color: "red",
+									fontSize: "0.85rem",
+									textAlign: "center",
+									mt: 1,
+								}}
+							>
+								{errors.name ? errors.name : ""}
+							</Typography>
 						</Grid>
 						<Grid item xs={12}>
 							<TextField
@@ -84,6 +117,16 @@ export default function SignUp() {
 								label="Mobile"
 								name="mobile"
 							/>
+							<Typography
+								sx={{
+									color: "red",
+									fontSize: "0.85rem",
+									textAlign: "center",
+									mt: 1,
+								}}
+							>
+								{errors.mobile ? errors.mobile : ""}
+							</Typography>
 						</Grid>
 						<Grid item xs={12}>
 							<TextField
@@ -94,8 +137,28 @@ export default function SignUp() {
 								type="password"
 								id="password"
 							/>
+							<Typography
+								sx={{
+									color: "red",
+									fontSize: "0.85rem",
+									textAlign: "center",
+									mt: 1,
+								}}
+							>
+								{errors.password ? errors.password : ""}
+							</Typography>
 						</Grid>
 					</Grid>
+					<Typography
+						sx={{
+							color: "red",
+							fontSize: "0.85rem",
+							textAlign: "center",
+							mt: 1,
+						}}
+					>
+						{errors.server ? errors.server : ""}
+					</Typography>
 					<Button
 						type="submit"
 						fullWidth

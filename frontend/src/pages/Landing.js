@@ -1,9 +1,16 @@
-import React from 'react'
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 function Landing() {
-  return (
-    <div>Landing</div>
-  )
+	const token = localStorage.getItem("token")
+	const navigate = useNavigate()
+	useEffect(() => {
+		if (token) {
+			navigate("/home")
+		} else {
+			navigate("/login")
+		}
+	}, [token, navigate])
 }
 
 export default Landing
