@@ -49,7 +49,6 @@ const userRegister = async (req, res) => {
 
 //validate user input
 const validateUser = (data) => {
-	console.log(data)
 	const { name, mobile, password } = data
 	const pswPattern = /^[a-zA-Z0-9]{8,}$/
 	const mobilePattern = /^[0-9]{10}$/
