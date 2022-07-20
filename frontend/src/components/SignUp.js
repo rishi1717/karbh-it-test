@@ -35,7 +35,6 @@ export default function SignUp() {
 			const err = validateSignUp(data)
 			setErrors(err)
 			if (err.email || err.password || err.mobile) {
-				console.log("error")
 				return
 			}
 			const details = {
@@ -52,10 +51,10 @@ export default function SignUp() {
 				timer: 3000,
 			})
 			navigate("/login")
-		} catch (err) {	
-			if (err.response.data.message){
+		} catch (err) {
+			if (err.response.data.message) {
 				setErrors({ ...errors, server: err.response.data.message })
-			} console.log(err.response.data.message)
+			}
 		}
 	}
 

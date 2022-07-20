@@ -4,11 +4,8 @@ import { Grid, TextField, Typography } from "@mui/material"
 import ProductCard from "../components/ProductCard"
 import backgroundImage from "../assets/background.jpg"
 import { Box } from "@mui/system"
-// import { useNavigate } from "react-router-dom"
 
 function Home() {
-	// const token = localStorage.getItem("token")
-	// const navigate = useNavigate()
 	const [products, setProducts] = useState([])
 	const [result, setResult] = useState([])
 	const [searchValue, setSearchValue] = useState("")
@@ -29,9 +26,8 @@ function Home() {
 		const searchResult = products.filter((obj) =>
 			obj.name.toLowerCase().includes(searchValue)
 		)
-		console.log(searchResult)
 		setResult(searchResult)
-	}, [searchValue])
+	}, [searchValue, products])
 
 	return (
 		<>
@@ -94,7 +90,7 @@ function Home() {
 				spacing={2}
 				mt={2}
 				px={{ xs: 2, sm: 4, md: 10, lg: 15 }}
-        mb={5}
+				mb={5}
 			>
 				{searchValue.length > 0
 					? result.map((product) => (

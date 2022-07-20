@@ -5,6 +5,7 @@ import { Box } from "@mui/system"
 
 function ProductCard({ product }) {
 	const addToCart = async () => {}
+	const imag1 = require(`../assets/${product.image}`)
 	return (
 		<>
 			<Card
@@ -16,7 +17,7 @@ function ProductCard({ product }) {
 				<CardMedia
 					component="img"
 					height="100"
-					image={product.image}
+					image={imag1}
 					alt={product.image}
 				/>
 				<CardContent>

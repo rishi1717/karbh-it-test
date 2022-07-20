@@ -34,7 +34,6 @@ export default function SignIn() {
 			const err = validateSignIn(data)
 			setErrors(err)
 			if (err.password || err.mobile) {
-				console.log("error")
 				return
 			}
 
@@ -58,7 +57,6 @@ export default function SignIn() {
 			if (err.response.data.message) {
 				setErrors({ ...errors, server: err.response.data.message })
 			}
-			console.log(err.response.data.message)
 		}
 	}
 
